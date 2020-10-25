@@ -5,6 +5,5 @@ GetOutOfMyDesktop.csproj
 Main.cs
 Program.cs
 properties/
-Resources/
 obj/
 bin/
