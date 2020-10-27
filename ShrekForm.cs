@@ -24,16 +24,16 @@ namespace GetOutOfMyDesktop
         private Point _destination = new Point(0, 0);
 
         //All shrek related images
-        private Image _defautPosImg = Properties.Resources.HollowWalk; //defaut animation
-        private Image _launchPosImg = Properties.Resources.HollowJab; //when throwing the mouse
-        private Image _touchPosImg = Properties.Resources.touchPosition;   //when the mouse touches shrek 
+        private Image _defaultImg = Properties.Resources.DefautPosition; //defaut animation
+        private Image _launchImg = Properties.Resources.launchPosition; //when throwing the mouse
+        private Image _touchImg = Properties.Resources.touchPosition; //when the mouse is being touched
         
         //how many times the Uptate function is called until the cicle resets 
         private int _interval = 1000;
         //how many fixed timestamps throught that function
         private int _timestamps = 10;
-        //the amount of time that shrek goes crazy when he touches the mouse 
-        private int _crazyTime = 500; //find better nam
+        //the amount of time that it seeks the mouse 
+        private int _crazyTime = 500;
 
         //simple counters for counting stuff
         private int _counter = 0;
@@ -43,14 +43,14 @@ namespace GetOutOfMyDesktop
         private int _sleepTime = -1;
 
         //method comunication bools 
-        private bool _isInsideShrek = false;
+        private bool _isInside = false;
         private bool _goAfterMouse = false;
         private bool _wasLaunched = false;
         private bool _isFacingRight = true;
 
         //sound efects
-        private SoundPlayer _dtrSP = new SoundPlayer(Properties.Resources.DTR);
-        private SoundPlayer _goomsSP = new SoundPlayer(Properties.Resources.GOOMS);
+        private SoundPlayer _gonnaSeekSound = new SoundPlayer(Properties.Resources.DTR);
+        private SoundPlayer _gonnaThrowSound = new SoundPlayer(Properties.Resources.GOOMS);
 
         //things about controlling the mouse that I dont know exactly how works
         [DllImport("user32.dll", EntryPoint = "SetCursorPos")]
@@ -64,9 +64,9 @@ namespace GetOutOfMyDesktop
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            TopMost = true; //makes sure that shrek is on top of everything 
+            TopMost = true; //makes sure that It's on top of everything 
             SMoodPicBox.Show();
-            ChangeMood(_defautPosImg);
+            ChangeMood(_defaultImg);
             UpdateTimer.Start(); //starts timer that is the main animator basically
         }
 
@@ -114,16 +114,16 @@ namespace GetOutOfMyDesktop
             {
                 _counter = 0;
 
-                 ChangeMood(_defautPosImg);
+                 ChangeMood(_defaultImg);
             }
 
             //events that happen every update throught a certain amount of time   
             //if shrek was after the cursor and got it into his hand
             if(_goAfterMouse && counterValue >= _interval - _crazyTime -1)
             {
-                if(counterValue == _interval - _crazyTime - 1) { _goomsSP.Play(); }
+                if(counterValue == _interval - _crazyTime - 1) { _gonnaThrowSound.Play(); }
                 //makes shrek go after the mouse if he is not in the mouse position
-                if (_isInsideShrek)
+                if (_isInside)
                 {
                     //shrek goes crazy
                     NewDestination(new Point(Screen.PrimaryScreen.Bounds.Width / 2, Screen.PrimaryScreen.Bounds.Height / 2));
@@ -135,7 +135,7 @@ namespace GetOutOfMyDesktop
                         _vel = random.Next(8, 14);
                     }
                 }
-                if(!_isInsideShrek)
+                if(!_isInside)
                 { 
                     NewDestination(MousePosition);
                     _vel = 8;
@@ -143,11 +143,11 @@ namespace GetOutOfMyDesktop
                 else if (counterValue >= _interval - 1 )
                 {
                     SecondaryUpdateTimer.Start();
-                    _dtrSP.Play();
+                    _gonnaSeekSound.Play();
                     _counter -= _counter;                
                     //throw animation
                     setCursosPos(random.Next(0, 1367), random.Next(0, 769));
-                    _isInsideShrek = false;
+                    _isInside = false;
                     _goAfterMouse = false;
                     _wasLaunched = true; 
                 }
@@ -172,14 +172,14 @@ namespace GetOutOfMyDesktop
                     _scounter = 0;
                     SecondaryUpdateTimer.Stop();
                     _wasLaunched = false;
-                    ChangeMood(_launchPosImg);
+                    ChangeMood(_launchImg);
                 }
             }
             
             //events that happen once per cicle
             if (counterValue == 0)
             {
-                ChangeMood(_defautPosImg);
+                ChangeMood(_defaultImg);
                 //Sleep(_interval/3);
             }
 
@@ -190,7 +190,7 @@ namespace GetOutOfMyDesktop
             }
 
             //events that happen multiple diferent predetermined timestamps
-            //in every multiple of 1/10th of the interval / how many times random events ocour
+            //in every multiple of the interval / how many times random events ocour
             if ((float)counterValue % ((float)(_interval/_timestamps)) == 0f)
             {
                 int randnum = random.Next(1, 11);
@@ -262,7 +262,7 @@ namespace GetOutOfMyDesktop
 
         //
 
-        //changes shrek animation//picture
+        //changes animation//picture
         private void ChangeMood(Image mood)
         {
             SMoodPicBox.Image = mood;
@@ -279,8 +279,7 @@ namespace GetOutOfMyDesktop
         //things about windows forms events
         private void SMoodPicBox_MouseEnter(object sender, EventArgs e)
         {
-            _isInsideShrek = true;
+            _isInside = true;
         }
-
     }
 }
