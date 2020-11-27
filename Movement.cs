@@ -7,7 +7,7 @@ using System.Linq;
 using System.Media;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace GetOutOfMyDesktop
@@ -17,16 +17,16 @@ namespace GetOutOfMyDesktop
         private Form Comun = new Form();
         private Path path;
 
-        //points
-        private Point Destination; //where the form should go
-        private Point Mouse;
-        //god so damn ramdom 
+        // points
+        private Point Destination; // where the form should go
+        
+        // god so damn ramdom 
         private Random random = new Random(); 
 
         private int Height = 0;
         private int Width = 0;
 
-        private int Vel = 10;
+        private int Vel = 60;
 
         private int count = 0;
 
@@ -39,30 +39,68 @@ namespace GetOutOfMyDesktop
             Destination = GetNewRandomDestination();
 
             // get a list of steps to follow to get to the destination
-            Mouse = new Point(Cursor.Position.X * -(Comun.Width / 2), Cursor.Position.Y * -(Comun.Height / 2));
-            path = new Path(Comun.Location, Mouse, Height, Width);
+            Destination = GetNewRandomDestination();
+            path = new Path(Comun.Location, Destination, Height, Width);
             path.Generate(Vel);
         }
 
         public void Update()
         {
-            if ( path.Steps.Count == count)
+            if (path.Steps.Count == count)
             {
-                // make a new step list if gone through all steps
-                Destination = Cursor.Position;
-                Mouse = new Point(Cursor.Position.X - (Comun.Width / 2), Cursor.Position.Y - (Comun.Height / 2));
-                path = new Path(Comun.Location, Mouse, Height, Width);
-                path.Generate(Vel / 2);
                 count = 0;
+                
+                if (Comunication.IsAfterMouse)
+                {
+                    GotoMouse();
+                }
+                else
+                {
+                    GotoRandom();
+                }
+
+                if (Destination.X <= Comun.Location.X)
+                {
+                    Comunication.IsFacingRight = true;
+                }
+                else
+                {
+                    Comunication.IsFacingRight = false;
+                }
             }
 
-            // use a counter to go through the step list
-            Console.WriteLine(Comun.Location);
-            Comun.Location = path.Steps[count];
+            // use a counter to go through the step list 
+            if (Comun.Location.X != path.Steps[count].X && Comun.Location.Y != path.Steps[count].Y)
+            {
+                Console.WriteLine(Comun.Location);
+                Comun.Location = path.Steps[count];
+            }
+
             count++;
         }
-        
-        //generates a random point a little bit bigger than the screen 
+
+        private void GotoRandom()
+        {
+            // make a new step list if gone through all steps
+            Destination = GetNewRandomDestination();
+            path = new Path(Comun.Location, Destination, Height, Width);
+            path.Generate(Vel * random.Next(1, 3));
+        }
+
+        private void GotoMouse()
+        {
+            if (Comun.Location.X == path.Steps[count].X && Comun.Location.Y == path.Steps[count].Y)
+            {
+                Comunication.StopMovement(1500);
+            }
+
+            // make a new step list if gone through all steps
+            Destination = new Point(Cursor.Position.X - (Comun.Width / 3), Cursor.Position.Y - (Comun.Height / 2)); ;
+            path = new Path(Comun.Location, Destination, Height, Width);
+            path.Generate(Vel * 2);
+        }
+
+        // generates a random point a little bit bigger than the screen 
         private Point GetNewRandomDestination()
         {
             random = new Random();
