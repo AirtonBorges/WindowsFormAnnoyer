@@ -25,7 +25,13 @@ namespace GetOutOfMyDesktop
         public static bool WasLaunched = false;
         public static bool IsFacingRight = true;
         public static bool IsAnimating = false;
-
+        private PictureBox Animator;
+        private Timer AnimationTimer;
+        private IContainer components;
+        private Timer InteractionTimer;
+        private Timer MovementTimer;
+        private Timer RandomEventTimer;
+        private Timer SleepTimer;
         private static int _sleepTime = 1;
 
         //basic rules of the universe;
@@ -34,7 +40,7 @@ namespace GetOutOfMyDesktop
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Comunication_Load(object sender, EventArgs e)
         {
             TopMost = true; //makes sure that It's on top of everything
 
@@ -55,7 +61,7 @@ namespace GetOutOfMyDesktop
 
             random = new Random();
         }
-
+        
         // update functions 
         private void RandomEventTimer_Tick(object sender, EventArgs e)
         {
@@ -182,6 +188,75 @@ namespace GetOutOfMyDesktop
 
         }
 
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            this.Animator = new System.Windows.Forms.PictureBox();
+            this.AnimationTimer = new System.Windows.Forms.Timer(this.components);
+            this.InteractionTimer = new System.Windows.Forms.Timer(this.components);
+            this.MovementTimer = new System.Windows.Forms.Timer(this.components);
+            this.RandomEventTimer = new System.Windows.Forms.Timer(this.components);
+            this.SleepTimer = new System.Windows.Forms.Timer(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.Animator)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // Animator
+            // 
+            this.Animator.Location = new System.Drawing.Point(0, 0);
+            this.Animator.Name = "Animator";
+            this.Animator.Size = new System.Drawing.Size(75, 96);
+            this.Animator.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.Animator.TabIndex = 0;
+            this.Animator.TabStop = false;
+            this.Animator.WaitOnLoad = true;
+            // 
+            // AnimationTimer
+            // 
+            this.AnimationTimer.Interval = 1;
+            this.AnimationTimer.Tick += new System.EventHandler(this.AnimationUpdate);
+            // 
+            // InteractionTimer
+            // 
+            this.InteractionTimer.Interval = 1;
+            this.InteractionTimer.Tick += new System.EventHandler(this.InteractionUpdate);
+            // 
+            // MovementTimer
+            // 
+            this.MovementTimer.Interval = 1;
+            this.MovementTimer.Tick += new System.EventHandler(this.MovementUpdate);
+            // 
+            // RandomEventTimer
+            // 
+            this.RandomEventTimer.Interval = 1500;
+            this.RandomEventTimer.Tick += new System.EventHandler(this.RandomEventTimer_Tick);
+            // 
+            // SleepTimer
+            // 
+            this.SleepTimer.Interval = 1;
+            this.SleepTimer.Tick += new System.EventHandler(this.SleepTick);
+            // 
+            // Comunication
+            // 
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.ClientSize = new System.Drawing.Size(76, 106);
+            this.ControlBox = false;
+            this.Controls.Add(this.Animator);
+            this.Cursor = System.Windows.Forms.Cursors.Help;
+            this.ForeColor = System.Drawing.SystemColors.Control;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "Comunication";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.TopMost = true;
+            this.TransparencyKey = System.Drawing.SystemColors.Control;
+            this.Load += new System.EventHandler(this.Comunication_Load);
+            this.Shown += new System.EventHandler(this.Comunication_Shown);
+            ((System.ComponentModel.ISupportInitialize)(this.Animator)).EndInit();
+            this.ResumeLayout(false);
 
+        }
     }
 }
