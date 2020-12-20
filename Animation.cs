@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Desktop_Hollow.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Media;
 using System.Runtime.InteropServices;
@@ -15,23 +17,24 @@ namespace GetOutOfMyDesktop
     public class Animation
     {
         // sound efects
-        private SoundPlayer _gonnaSeekSound = new SoundPlayer(Properties.Resources.DTR);
-        private SoundPlayer _gonnaThrowSound = new SoundPlayer(Properties.Resources.GOOMS);
+        private SoundPlayer _gonnaThrowSound = new SoundPlayer(Resources.Hollow_Stab_Sound);
 
         // all images
-        private static Image _defaultImg = Properties.Resources.DefautPosition; // defaut animation
-        private static Image _launchImg = Properties.Resources.launchPosition; // when throwing the mouse
-        private static Image _touchImg = Properties.Resources.touchPosition; // when the mouse is being touched
+        private static Image _defaultImg = Resources.Hollow_Walk; // defaut animation
+        private static Image _launchImg = Resources.Hollow_Jab; // when throwing the mouse
 
+        Gif gifImage;
         private PictureBox Animate = new PictureBox();
 
+        private bool can_default = true;
         private bool was_facing_right = true;
-
+        
         public Animation(PictureBox Animator)
         {
             Animate = Animator;
-            Animator.Show();
-            Animator.Image = _defaultImg;
+            Animate.Show();
+
+            gifImage = new Gif(_defaultImg, 5);
         }
 
         public void Update()
@@ -39,32 +42,33 @@ namespace GetOutOfMyDesktop
             if (!Comunication.IsFacingRight && !was_facing_right)
             {
                 was_facing_right = true;
-                Animate.Image.RotateFlip(RotateFlipType.RotateNoneFlipX);
             }
 
             if (Comunication.IsFacingRight && was_facing_right)
             {
                 was_facing_right = false;
-                Animate.Image.RotateFlip(RotateFlipType.RotateNoneFlipX);
             }
 
-            if (Comunication.WasLaunched)
+            if (Comunication.WasLaunched && !can_default)
             {
-                Animate.Image = _launchImg;
+                gifImage = new Gif(_launchImg, 5, true);
+                Animate.Invalidate();
+                //Comunication.StopAnimating(2000);
                 _gonnaThrowSound.Play();
-                Comunication.StopAnimating(2000);
+                can_default = true;
             }
             else
             {
-                if (!Comunication.IsInside)
+                if (!Comunication.IsInside && !Comunication.WasLaunched && can_default)
                 {
-                    Animate.Image = _defaultImg;
-                }
-                else
-                {
-                    Animate.Image = _touchImg;
+                    gifImage = new Gif(_defaultImg, 5);
+                    Animate.Invalidate();
+                    can_default = false;
                 }
             }
+
+            Animate.Image = gifImage.GetNextFrame(was_facing_right);
+            Animate.Invalidate();
         }
     }
 }

@@ -16,18 +16,30 @@ namespace GetOutOfMyDesktop
 
         Random random = new Random();
 
-        public void Iteraction() {}
+        int Height;
+        int Width;
+
+        public Interaction(int X, int Y)
+        {
+            Height = Y;
+            Width = X;
+        }
+
+        public void Launch_To(int x, int y)
+        {
+            Height = y;
+            Width = x;
+        }
 
         public void Update()
         {
             if (!Comunication.WasLaunched && Comunication.IsAfterMouse && Comunication.IsInside)
             {
+                Comunication.stopDetection(500);
+                
                 // get a new position to throw the mouse at, and then trow it there
                 Point NewRandomMousePos = new Point(random.Next(0, 1366), random.Next(0, 768));
-                setCursosPos(NewRandomMousePos.X, NewRandomMousePos.Y);
-
-                // give the mouse some time to recover
-                Comunication.stopDetection(1500);
+                setCursosPos(Height, Width);
             }
         }
     }

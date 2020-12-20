@@ -46,10 +46,15 @@ namespace GetOutOfMyDesktop
 
         public void Update()
         {
+            if (Comunication.IsAfterMouse && Comunication.IsInside)
+            {
+                Comunication.StopMovement(1000);
+            }
+
             if (path.Steps.Count == count)
             {
                 count = 0;
-                
+
                 if (Comunication.IsAfterMouse)
                 {
                     GotoMouse();
@@ -72,7 +77,6 @@ namespace GetOutOfMyDesktop
             // use a counter to go through the step list 
             if (Comun.Location.X != path.Steps[count].X && Comun.Location.Y != path.Steps[count].Y)
             {
-                Console.WriteLine(Comun.Location);
                 Comun.Location = path.Steps[count];
             }
 
@@ -89,15 +93,10 @@ namespace GetOutOfMyDesktop
 
         private void GotoMouse()
         {
-            if (Comun.Location.X == path.Steps[count].X && Comun.Location.Y == path.Steps[count].Y)
-            {
-                Comunication.StopMovement(1500);
-            }
-
             // make a new step list if gone through all steps
             Destination = new Point(Cursor.Position.X - (Comun.Width / 3), Cursor.Position.Y - (Comun.Height / 2)); ;
             path = new Path(Comun.Location, Destination, Height, Width);
-            path.Generate(Vel * 2);
+            path.Generate(Vel / 2);
         }
 
         // generates a random point a little bit bigger than the screen 
